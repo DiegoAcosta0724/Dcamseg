@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo de Productos Pro</title>
+    <!-- Tailwind CSS for modern, responsive styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="bg-indigo-600 text-white p-2.5 rounded-xl shadow-md flex items-center justify-center">
+                    <i class="fa-solid fa-store text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg text-slate-900 tracking-tight">CatálogoPro</h1>
+                    <p class="text-xs text-slate-500">Gestión inteligente de inventario</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-3">
+                <button onclick="openProductModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl shadow-md transition-all flex items-center space-x-2">
+                    <i class="fa-solid fa-plus"></i>
+                    <span>Nuevo Producto</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Dashboard Stats & Search Bar -->
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-8">
+            <!-- Stats -->
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center space-x-4">
+                <div class="bg-indigo-50 text-indigo-600 p-3.5 rounded-xl">
+                    <i class="fa-solid fa-boxes-stacked text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Total Productos</p>
+                    <h3 id="statTotal" class="text-2xl font-bold text-slate-900">0</h3>
+                </div>
+            </div>
+            
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center space-x-4">
+                <div class="bg-emerald-50 text-emerald-600 p-3.5 rounded-xl">
+                    <i class="fa-solid fa-dollar-sign text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Valor Inventario</p>
+                    <h3 id="statValue" class="text-2xl font-bold text-slate-900">$0</h3>
+                </div>
+            </div>
+
+            <!-- Search & Filters (Spans 2 cols on lg) -->
+            <div class="lg:col-span-2 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row gap-3 items-center justify-between">
+                <div class="relative w-full">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400">
+                        <i class="fa-solid fa-search"></i>
+                    </span>
+                    <input type="text" id="searchInput" oninput="filterProducts()" placeholder="Buscar por nombre, categoría o características..." class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all">
+                </div>
+                <div class="w-full sm:w-auto flex items-center space-x-2">
+                    <select id="categoryFilter" onchange="filterProducts()" class="w-full sm:w-48 bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all">
+                        <option value="">Todas las categorías</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Grid Container -->
+        <div id="productContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <!-- Dynamic Cards Injected Here -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="hidden flex flex-col items-center justify-center py-16 px-4 bg-white rounded-2xl border border-slate-200 shadow-sm mt-4">
+            <div class="bg-slate-100 text-slate-400 p-5 rounded-full mb-4">
+                <i class="fa-solid fa-box-open text-3xl"></i>
+            </div>
+            <h3 class="text-lg font-semibold text-slate-800 mb-1">No se encontraron productos</h3>
+            <p class="text-slate-500 text-sm text-center max-w-sm mb-6">Intenta cambiar los términos de búsqueda o añade tu primer producto al inventario.</p>
+            <button onclick="openProductModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl shadow-md transition-all">
+                Crear nuevo producto
+            </button>
+        </div>
+
+    </main>
+
+    <!-- Modal for Add/Edit Product -->
+    <div id="productModal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-xl w-full mx-4 overflow-hidden transform scale-95 transition-transform duration-300 max-h-[90vh] flex flex-col">
+            
+            <!-- Modal Header -->
+            <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+                <h3 id="modalTitle" class="font-bold text-slate-800 text-lg">Agregar Producto</h3>
+                <button onclick="closeProductModal()" class="text-slate-400 hover:text-slate-600 p-2 rounded-lg transition-colors">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="p-6 overflow-y-auto custom-scrollbar flex-grow">
+                <form id="productForm" onsubmit="handleFormSubmit(event)" class="space-y-4">
+                    <input type="hidden" id="productId">
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Nombre del Producto *</label>
+                        <input type="text" id="name" required placeholder="Ej. Camiseta Deportiva Pro" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all">
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Precio ($) *</label>
+                            <input type="number" step="0.01" min="0" id="price" required placeholder="29.99" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Categoría *</label>
+                            <input type="text" id="category" required placeholder="Ej. Ropa, Electrónica" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Características / Descripción *</label>
+                        <textarea id="features" rows="3" required placeholder="Ej. Tela transpirable, protección UV, disponible en tallas S, M, L..." class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all"></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Imagen del Producto</label>
+                        <div class="space-y-3">
+                            <!-- Toggle image mode -->
+                            <div class="flex space-x-4 text-xs font-medium text-slate-600">
+                                <label class="flex items-center space-x-1.5 cursor-pointer">
+                                    <input type="radio" name="imageSourceType" value="url" checked onchange="toggleImageSource('url')" class="text-indigo-600 focus:ring-indigo-500">
+                                    <span>Usar URL de Imagen</span>
+                                </label>
+                                <label class="flex items-center space-x-1.5 cursor-pointer">
+                                    <input type="radio" name="imageSourceType" value="file" onchange="toggleImageSource('file')" class="text-indigo-600 focus:ring-indigo-500">
+                                    <span>Subir Imagen (Archivo)</span>
+                                </label>
+                            </div>
+
+                            <!-- URL Input -->
+                            <div id="imageUrlContainer">
+                                <input type="url" id="imageUrl" placeholder="https://ejemplo.com/imagen.jpg" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all">
+                            </div>
+
+                            <!-- File Upload Input -->
+                            <div id="imageFileContainer" class="hidden">
+                                <input type="file" id="imageFile" accept="image/*" onchange="previewUploadedImage(event)" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer">
+                            </div>
+
+                            <!-- Image Preview Box -->
+                            <div class="mt-2 flex items-center space-x-4">
+                                <div class="w-16 h-16 rounded-xl border border-slate-200 bg-slate-100 overflow-hidden flex items-center justify-center shrink-0">
+                                    <img id="previewImg" src="" alt="Vista previa" class="w-full h-full object-cover hidden">
+                                    <i id="previewIcon" class="fa-solid fa-image text-slate-300 text-xl"></i>
+                                </div>
+                                <p class="text-xs text-slate-400">La imagen seleccionada se mostrará en las tarjetas del catálogo.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modal Footer -->
+                    <div class="pt-4 border-t border-slate-100 flex items-center justify-end space-x-3">
+                        <button type="button" onclick="closeProductModal()" class="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-sm font-medium hover:bg-slate-50 transition-all">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-xl shadow-md transition-all">
+                            Guardar Producto
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-24 opacity-0 transition-all duration-300 bg-slate-900 text-white px-5 py-3 rounded-xl shadow-xl flex items-center space-x-3">
+        <i id="toastIcon" class="fa-solid fa-circle-check text-emerald-400"></i>
+        <span id="toastMessage" class="text-sm font-medium">Operación exitosa</span>
+    </div>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // Initial Mock Data if localStorage is empty
+        const defaultProducts = [
+            {
+                id: '1',
+                name: 'Zapatillas Urbanas Runner',
+                price: 79.99,
+                category: 'Calzado',
+                features: 'Suela amortiguada, diseño moderno, ligeras y transpirables para uso diario.',
+                image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=600&q=80'
+            },
+            {
+                id: '2',
+                name: 'Reloj Inteligente Sport',
+                price: 129.50,
+                category: 'Tecnología',
+                features: 'Monitoreo de frecuencia cardíaca, resistencia al agua IP68, batería de 7 días.',
+                image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=600&q=80'
+            },
+            {
+                id: '3',
+                name: 'Mochila Antirrobo Ejecutiva',
+                price: 45.00,
+                category: 'Accesorios',
+                features: 'Puerto de carga USB integrado, compartimento acolchado para laptop de 15.6 pulgadas.',
+                image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=600&q=80'
+            }
+        ];
+
+        let products = [];
+        let currentImageBase64 = '';
+
+        // Initialize App on Load
+        window.addEventListener('DOMContentLoaded', () => {
+            loadProducts();
+            renderProducts();
+            updateStats();
+            populateCategoryFilter();
+        });
+
+        // Load from LocalStorage
+        function loadProducts() {
+            const stored = localStorage.getItem('catalog_products');
+            if (stored) {
+                try {
+                    products = JSON.parse(stored);
+                } catch(e) {
+                    products = defaultProducts;
+                }
+            } else {
+                products = defaultProducts;
+                saveProducts();
+            }
+        }
+
+        // Save to LocalStorage
+        function saveProducts() {
+            localStorage.setItem('catalog_products', JSON.stringify(products));
+            updateStats();
+            populateCategoryFilter();
+        }
+
+        // Update dashboard metrics
+        function updateStats() {
+            document.getElementById('statTotal').innerText = products.length;
+            const totalVal = products.reduce((acc, curr) => acc + parseFloat(curr.price || 0), 0);
+            document.getElementById('statValue').innerText = '$' + totalVal.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        // Populate category filter dropdown
+        function populateCategoryFilter() {
+            const select = document.getElementById('categoryFilter');
+            const currentVal = select.value;
+            const categories = [...new Set(products.map(p => p.category))].filter(Boolean);
+            
+            let options = '<option value="">Todas las categorías</option>';
+            categories.forEach(cat => {
+                options += `<option value="${cat}">${cat}</option>`;
+            });
+            select.innerHTML = options;
+            select.value = currentVal;
+        }
+
+        // Render Product Grid Cards
+        function renderProducts(filteredList = null) {
+            const container = document.getElementById('productContainer');
+            const emptyState = document.getElementById('emptyState');
+            const listToRender = filteredList !== null ? filteredList : products;
+
+            if (listToRender.length === 0) {
+                container.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            let html = '';
+
+            listToRender.forEach(p => {
+                const imgSource = p.image || 'https://placehold.co/600x400/f1f5f9/94a3b8?text=Sin+Imagen';
+                html += `
+                    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col justify-between hover:shadow-lg transition-all duration-300 group">
+                        <div>
+                            <!-- Image Container -->
+                            <div class="relative h-48 bg-slate-100 overflow-hidden">
+                                <img src="${imgSource}" alt="${p.name}" onerror="this.src='https://placehold.co/600x400/f1f5f9/94a3b8?text=Imagen+No+Disponible'" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                <span class="absolute top-3 left-3 bg-white/90 backdrop-blur-md text-slate-800 text-xs font-semibold px-3 py-1 rounded-full shadow-sm">
+                                    ${escapeHtml(p.category)}
+                                </span>
+                            </div>
+                            
+                            <!-- Content Details -->
+                            <div class="p-5">
+                                <div class="flex items-start justify-between mb-2">
+                                    <h3 class="font-bold text-slate-800 text-base line-clamp-1">${escapeHtml(p.name)}</h3>
+                                </div>
+                                <p class="text-xs text-slate-500 line-clamp-2 mb-4 leading-relaxed">${escapeHtml(p.features)}</p>
+                            </div>
+                        </div>
+
+                        <!-- Card Footer -->
+                        <div class="px-5 pb-5 pt-0 flex items-center justify-between border-t border-slate-100 mt-2">
+                            <div>
+                                <span class="text-xs text-slate-400 block">Precio</span>
+                                <span class="text-lg font-bold text-indigo-600">$${parseFloat(p.price).toFixed(2)}</span>
+                            </div>
+                            <div class="flex items-center space-x-1">
+                                <button onclick="editProduct('${p.id}')" title="Editar" class="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors">
+                                    <i class="fa-solid fa-pen-to-square"></i>
+                                </button>
+                                <button onclick="deleteProduct('${p.id}')" title="Eliminar" class="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        // Filter and Search logic
+        function filterProducts() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const category = document.getElementById('categoryFilter').value;
+
+            const filtered = products.filter(p => {
+                const matchesQuery = p.name.toLowerCase().includes(query) || 
+                                     p.category.toLowerCase().includes(query) || 
+                                     p.features.toLowerCase().includes(query);
+                const matchesCategory = category === '' || p.category === category;
+                return matchesQuery && matchesCategory;
+            });
+
+            renderProducts(filtered);
+        }
+
+        // Modal Open / Close Controllers
+        function openProductModal(id = null) {
+            const modal = document.getElementById('productModal');
+            const form = document.getElementById('productForm');
+            form.reset();
+            document.getElementById('productId').value = '';
+            currentImageBase64 = '';
+            resetImagePreview();
+
+            if (id) {
+                document.getElementById('modalTitle').innerText = 'Editar Producto';
+                const prod = products.find(p => p.id === id);
+                if (prod) {
+                    document.getElementById('productId').value = prod.id;
+                    document.getElementById('name').value = prod.name;
+                    document.getElementById('price').value = prod.price;
+                    document.getElementById('category').value = prod.category;
+                    document.getElementById('features').value = prod.features;
+                    
+                    if (prod.image) {
+                        if (prod.image.startsWith('data:')) {
+                            document.querySelector('input[name="imageSourceType"][value="file"]').checked = true;
+                            toggleImageSource('file');
+                            currentImageBase64 = prod.image;
+                        } else {
+                            document.querySelector('input[name="imageSourceType"][value="url"]').checked = true;
+                            toggleImageSource('url');
+                            document.getElementById('imageUrl').value = prod.image;
+                        }
+                        showImagePreview(prod.image);
+                    }
+                }
+            } else {
+                document.getElementById('modalTitle').innerText = 'Agregar Producto';
+                document.querySelector('input[name="imageSourceType"][value="url"]').checked = true;
+                toggleImageSource('url');
+            }
+
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            modal.querySelector('div').classList.remove('scale-95');
+            modal.querySelector('div').classList.add('scale-100');
+        }
+
+        function closeProductModal() {
+            const modal = document.getElementById('productModal');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            modal.querySelector('div').classList.remove('scale-100');
+            modal.querySelector('div').classList.add('scale-95');
+        }
+
+        // Toggle image input source (URL vs File Upload)
+        function toggleImageSource(type) {
+            const urlContainer = document.getElementById('imageUrlContainer');
+            const fileContainer = document.getElementById('imageFileContainer');
+            
+            if (type === 'url') {
+                urlContainer.classList.remove('hidden');
+                fileContainer.classList.add('hidden');
+                const urlVal = document.getElementById('imageUrl').value;
+                if (urlVal) showImagePreview(urlVal);
+                else resetImagePreview();
+            } else {
+                urlContainer.classList.add('hidden');
+                fileContainer.classList.remove('hidden');
+                if (currentImageBase64) showImagePreview(currentImageBase64);
+                else resetImagePreview();
+            }
+        }
+
+        // Handle File Upload & Convert to Base64
+        function previewUploadedImage(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    currentImageBase64 = e.target.result;
+                    showImagePreview(currentImageBase64);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Preview helper
+        function showImagePreview(src) {
+            const img = document.getElementById('previewImg');
+            const icon = document.getElementById('previewIcon');
+            img.src = src;
+            img.classList.remove('hidden');
+            icon.classList.add('hidden');
+        }
+
+        function resetImagePreview() {
+            const img = document.getElementById('previewImg');
+            const icon = document.getElementById('previewIcon');
+            img.src = '';
+            img.classList.add('hidden');
+            icon.classList.remove('hidden');
+        }
+
+        // Listen to URL input changes for real-time preview
+        document.getElementById('imageUrl').addEventListener('input', function(e) {
+            const val = e.target.value.trim();
+            if (val) showImagePreview(val);
+            else resetImagePreview();
+        });
+
+        // Form Submit Handler (Create or Update)
+        function handleFormSubmit(event) {
+            event.preventDefault();
+            
+            const id = document.getElementById('productId').value;
+            const name = document.getElementById('name').value.trim();
+            const price = parseFloat(document.getElementById('price').value);
+            const category = document.getElementById('category').value.trim();
+            const features = document.getElementById('features').value.trim();
+            
+            const imageType = document.querySelector('input[name="imageSourceType"]:checked').value;
+            let image = '';
+
+            if (imageType === 'url') {
+                image = document.getElementById('imageUrl').value.trim();
+            } else {
+                image = currentImageBase64;
+            }
+
+            if (!name || isNaN(price) || !category) {
+                showToast('Por favor completa los campos obligatorios', 'error');
+                return;
+            }
+
+            if (id) {
+                // Update existing
+                const index = products.findIndex(p => p.id === id);
+                if (index !== -1) {
+                    products[index] = { id, name, price, category, features, image };
+                    showToast('Producto actualizado correctamente');
+                }
+            } else {
+                // Create new
+                const newProduct = {
+                    id: Date.now().toString(),
+                    name,
+                    price,
+                    category,
+                    features,
+                    image
+                };
+                products.unshift(newProduct);
+                showToast('Producto creado con éxito');
+            }
+
+            saveProducts();
+            filterProducts();
+            closeProductModal();
+        }
+
+        // Edit product shortcut
+        function editProduct(id) {
+            openProductModal(id);
+        }
+
+        // Delete product
+        function deleteProduct(id) {
+            if (confirm('¿Estás seguro de que deseas eliminar este producto?')) {
+                products = products.filter(p => p.id !== id);
+                saveProducts();
+                filterProducts();
+                showToast('Producto eliminado');
+            }
+        }
+
+        // Custom Toast Notification System
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            const toastIcon = document.getElementById('toastIcon');
+
+            toastMessage.innerText = message;
+            if (type === 'success') {
+                toastIcon.className = 'fa-solid fa-circle-check text-emerald-400';
+            } else {
+                toastIcon.className = 'fa-solid fa-circle-exclamation text-rose-400';
+            }
+
+            toast.classList.remove('translate-y-24', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-24', 'opacity-0');
+            }, 3000);
+        }
+
+        // HTML Escape Helper for security
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+    </script>
+</body>
+</html>
